@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(attendant)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Client {
+  id          Int         @id @default(autoincrement())
+  type        String      @default("fisica")
+  name        String
+  cpf         String?     @unique
+  cnpj        String?     @unique
+  razaoSocial String?
+  email       String?
+  address     String?
+  notes       String?     @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  phones      Phone[]
+  contracts   Contract[]
+  contractClients ContractClient[]
+
+  @@map("clients")
+}
+
+model Phone {
+  id       Int    @id @default(autoincrement())
+  number   String
+  label    String @default("principal")
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("phones")
+}
+
+model Contract {
+  id            Int             @id @default(autoincrement())
+  clientId      Int
+  client        Client          @relation(fields: [clientId], references: [id])
+  totalAmount     Float
+  amountInWords   String?
+  paymentMethod   String?
+  status          ContractStatus  @default(active)
+  notes           String?         @db.Text
+  template        String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  dates         ContractDate[]
+  payments      Payment[]
+  additionalClients ContractClient[]
+
+  @@map("contracts")
+}
+
+model ContractClient {
+  id         Int      @id @default(autoincrement())
+  contractId Int
+  clientId   Int
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  client     Client   @relation(fields: [clientId], references: [id])
+
+  @@unique([contractId, clientId])
+  @@map("contract_clients")
+}
+
+model ContractDate {
+  id         Int      @id @default(autoincrement())
+  contractId Int
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  date       DateTime @db.Date
+
+  @@map("contract_dates")
+}
+
+model Payment {
+  id         Int           @id @default(autoincrement())
+  contractId Int
+  contract   Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  amount     Float
+  dueDate    DateTime      @db.Date
+  paidAt     DateTime?
+  status     PaymentStatus @default(pending)
+  notes      String?
+
+  @@map("payments")
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model ContractTemplate {
+  id        Int      @id @default(autoincrement())
+  name      String
+  content   String   @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contract_templates")
+}
+
+enum Role {
+  master
+  attendant
+}
+
+enum ContractStatus {
+  active
+  cancelled
+  completed
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  overdue
+}
