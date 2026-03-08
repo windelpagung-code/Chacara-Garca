@@ -18,7 +18,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     },
   });
 
-  if (\!client) return NextResponse.json({ error: "Cliente não encontrado" }, { status: 404 });
+  if (!client) return NextResponse.json({ error: "Cliente não encontrado" }, { status: 404 });
   return NextResponse.json(client);
 }
 
