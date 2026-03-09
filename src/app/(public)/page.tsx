@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/db";
 import PublicCalendar from "@/components/modules/PublicCalendar";
 import Link from "next/link";
