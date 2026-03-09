@@ -134,7 +134,7 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(functi
     const isEmpty = !value || value === "<p></p>";
     if (isEmpty && editor.isEmpty) return;
     if (value === current) return;
-    editor.commands.setContent(value || "", false);
+    editor.commands.setContent(value || "", { emitUpdate: false });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
