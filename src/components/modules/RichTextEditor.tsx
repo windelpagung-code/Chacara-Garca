@@ -153,7 +153,7 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(functi
       setHtmlSource(editor.getHTML());
       setHtmlMode(true);
     } else {
-      editor.commands.setContent(htmlSource, false);
+      editor.commands.setContent(htmlSource, { emitUpdate: false });
       onChange(htmlSource);
       setHtmlMode(false);
     }
